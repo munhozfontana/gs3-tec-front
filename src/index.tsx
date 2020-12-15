@@ -1,12 +1,29 @@
+import { Puff } from '@agney/react-loading';
+import { observer } from 'mobx-react';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Routing } from './core/Routing';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { LoadingStore } from './store/loadingStore';
+
+
+
+
+const App = observer(({ loading }: { loading: any }) => (
+  loading.load ?
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div style={{ width: "200px" }}>
+        <Puff />
+      </div>
+    </div>
+    :
+    <Routing />
+))
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App loading={LoadingStore} />
   </React.StrictMode>,
   document.getElementById('root')
 );
