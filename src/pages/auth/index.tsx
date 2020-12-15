@@ -1,23 +1,22 @@
-import { useLoading } from '@agney/react-loading';
 import { Avatar, Button, Container, Grid, Paper, TextField } from '@material-ui/core';
 import React, { useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { CustomSnackbar, CustomSnackbarRef } from '../../components/sanckbar';
+import { AuthUser } from '../../core/models/auth/authModel';
+import { FieldForm } from '../../core/models/forms';
 import { LoginService } from '../../services/loginService';
 import { LoadingStore } from '../../store/loadingStore';
-// import LoadingStore from '../../store/loadingStore';
 import { FormValidators } from '../../validations/form-validators';
-import { AuthUser } from './models/AuthProps';
 import './style.css';
 
 export default function Auth() {
-
+    var history = useHistory();
     const refSnackBar = useRef<CustomSnackbarRef>();
     const [form, setForm] = useState<AuthUser>({
         formSubmited: false,
-        login: { value: "", msgError: "" },
-        senha: { value: "", msgError: "" }
+        login: {} as FieldForm,
+        senha: {} as FieldForm
     });
-
 
     const formValidade = async () => {
         LoadingStore.change(true);
@@ -132,7 +131,9 @@ export default function Auth() {
                                 <Button
                                     fullWidth
                                     variant="contained"
-                                    color="secondary">Cadastro</Button>
+                                    color="secondary"
+                                    onClick={() => history.push("cadastro-usuario")}
+                                >Cadastro</Button>
                             </Grid>
                         </Grid>
 
