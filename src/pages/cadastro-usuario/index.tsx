@@ -1,16 +1,18 @@
 import { Button, Container, Grid, Paper, TextField } from "@material-ui/core";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import ChipsArray from "../../components/chips";
 import { CustomSnackbar, CustomSnackbarRef } from "../../components/sanckbar";
 import { CadastroUsuarioModel } from "../../core/models/cadastro-usuario/cadastroUsuarioModel";
 import { FieldForm, FieldFormArray } from "../../core/models/forms";
 import { CadastroService } from "../../services/cadastroService";
 import { ViaCepService } from "../../services/viaCepService";
-import { LoadingStore } from "../../store/loadingStore";
+import { AuthStore } from "../../store/storeAuth";
 import { FormValidators } from "../../validations/form-validators";
 import { Masks } from "../../validations/masks";
 
 export default function CadastroUsuario() {
+  var history = useHistory();
   const refSnackBar = useRef<CustomSnackbarRef>();
   const [form, setForm] = useState<CadastroUsuarioModel>({
     formSubmited: false,
@@ -28,9 +30,15 @@ export default function CadastroUsuario() {
     email: { msgError: "" } as FieldFormArray,
   });
 
+  useEffect(() => {
+    if(AuthStore.getToken() === "") {
+      history.goBack()
+    }
+  }, []);
+
+
   const formValidade = async (submit: any) => {
     submit.preventDefault();
-    console.log(form.email, form.telefone);
 
     setForm((prev) => {
       return {
@@ -57,20 +65,20 @@ export default function CadastroUsuario() {
       return;
     }
 
-   
-
     try {
-      LoadingStore.change(true);
       const formToSent = prepararJson();
+
+      refSnackBar.current?.onClick({
+        message: "Cadastrado",
+        error: false,
+      });
       await CadastroService.post(formToSent);
     } catch (error) {
-      LoadingStore.change(false);
       refSnackBar.current?.onClick({
         message: "Erro ao tentar acessar o serviço",
         error: true,
       });
     }
-    LoadingStore.change(false);
   };
 
   const setEnedereco = (
@@ -323,7 +331,6 @@ export default function CadastroUsuario() {
                 <ChipsArray
                   label="Números"
                   add={(list) => {
-                    console.log(list);
                     listValidation(list, "Telefone", "telefone");
                   }}
                   listSelect={[
@@ -338,7 +345,6 @@ export default function CadastroUsuario() {
                 <ChipsArray
                   label="Email"
                   add={(list) => {
-                    console.log(list);
                     listValidation(list, "E-mail", "email");
                   }}
                 ></ChipsArray>
@@ -360,7 +366,12 @@ export default function CadastroUsuario() {
               </Grid>
 
               <Grid item={true} xs={5}>
-                <Button fullWidth variant="contained" color="secondary">
+                <Button
+                  onClick={history.goBack}
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                >
                   Voltar
                 </Button>
               </Grid>
@@ -375,7 +386,9 @@ export default function CadastroUsuario() {
   function prepararJson() {
     const formToSent = FormValidators.cadastroUsuarioToHTPP(form);
     formToSent.cpf = FormValidators.justNumbers(formToSent.cpf);
-    formToSent.endereco.cep = FormValidators.justNumbers(formToSent.endereco.cep);
+    formToSent.endereco.cep = FormValidators.justNumbers(
+      formToSent.endereco.cep
+    );
     formToSent.telefone = formToSent.telefone.map(FormValidators.justNumbers);
     return formToSent;
   }

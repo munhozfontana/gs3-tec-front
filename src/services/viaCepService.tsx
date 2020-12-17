@@ -22,4 +22,5 @@ export interface ViaCepModelHTTPResponse {
     gia: string,
     ddd: string,
     siafi: string,
+    senha: string
 }

@@ -11,14 +11,17 @@ import { LoadingStore } from './store/loadingStore';
 
 
 const App = observer(({ loading }: { loading: any }) => (
-  loading.load ?
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-      <div style={{ width: "200px" }}>
+  <>
+  <Routing/> 
+  {
+   loading.load &&
+      <div style={{ position: "absolute", width: "20%", top: "28%", left: "40%" }}>
         <Puff />
       </div>
-    </div>
-    :
-    <Routing />
+  }
+  
+  </>
+    
 ))
 
 ReactDOM.render(
